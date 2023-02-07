@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 
 // Routes
 const adminRoute = require("../routes/admin");
+const customerRoute = require("../routes/customer");
+const vehicleRoute = require("../routes/vehicle");
 
 module.exports = (app) => {
   // bodyParser
@@ -12,4 +14,6 @@ module.exports = (app) => {
 
   // Routes
   app.use("/admin", adminRoute);
+  app.use("/customer", customerRoute);
+  app.use("/vehicle", vehicleRoute);
 };
