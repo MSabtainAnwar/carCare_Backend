@@ -42,7 +42,7 @@ adminSchema.methods.createToken = async function (key) {
         _id: this._id,
       },
       key,
-      { expiresIn: "10s" }
+      { expiresIn: "1d" }
     );
     this.token = token;
     await this.save();

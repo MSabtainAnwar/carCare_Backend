@@ -23,7 +23,8 @@ const createCustomer = async (req, res) => {
 // get-customer-list
 const getCustomerList = async (req, res) => {
   try {
-    let { pageNo, perPage } = req.body;
+    let { pageNo, perPage, filter } = req.body;
+    console.log(filter);
     pageNo = pageNo || 1;
     await Customer.aggregate([
       {
@@ -40,6 +41,11 @@ const getCustomerList = async (req, res) => {
         },
       },
       {
+        $match: {
+          "vehicles.vehicleNo": { $regex: filter.vehicleNo, $options: "i" },
+        },
+      },
+      {
         $skip: perPage * pageNo - perPage,
       },
       {
@@ -52,7 +58,6 @@ const getCustomerList = async (req, res) => {
           if (err) {
             res.status(404).json(responseStatus(false, "not-found", `${err}`));
           }
-          console.log("Count", count);
           let finalData = {
             data,
             currentPage: pageNo,
