@@ -24,8 +24,14 @@ const createCustomer = async (req, res) => {
 const getCustomerList = async (req, res) => {
   try {
     let { pageNo, perPage, filter, status } = req.body;
-    console.log(filter);
     pageNo = pageNo || 1;
+
+    // count-all-Active-customers
+    const activeCustomer = await Customer.find({ status: "active" }).count();
+    // count-all-Inactive-customers
+    const inactiveCustomer = await Customer.find({
+      status: "inactive",
+    }).count();
 
     let conditions = [];
 
@@ -95,6 +101,7 @@ const getCustomerList = async (req, res) => {
       });
     }
 
+    // wrapping-all-quries-in-aggrigation-piplines
     await Customer.aggregate([
       {
         $match: {
@@ -109,21 +116,21 @@ const getCustomerList = async (req, res) => {
         $limit: perPage,
       },
     ]).exec((err, data) => {
-      Customer.find({ status: "active" })
-        .count()
-        .exec((err, count) => {
-          if (err) {
-            res.status(404).json(responseStatus(false, "not-found", `${err}`));
-          }
-          let finalData = {
-            customers: data,
-            currentPage: pageNo,
-            pages: Math.ceil(count / perPage),
-          };
-          res
-            .status(200)
-            .json(responseStatus(true, "ok", "Success", finalData));
-        });
+      if (err) {
+        res.status(404).json(responseStatus(false, "not-found", `${err}`));
+      }
+      let finalData = {
+        customers: data,
+        currentPage: pageNo,
+        pages: Math.ceil(
+          status === "active"
+            ? activeCustomer / perPage
+            : inactiveCustomer / perPage
+        ),
+        activeCustomer,
+        inactiveCustomer,
+      };
+      res.status(200).json(responseStatus(true, "ok", "Success", finalData));
     });
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));
