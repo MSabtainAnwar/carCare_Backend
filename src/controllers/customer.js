@@ -137,4 +137,30 @@ const getCustomerList = async (req, res) => {
   }
 };
 
-module.exports = { createCustomer, getCustomerList };
+// Update-Status-By-Id
+const updateCustomerStatusById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+    const updatedCustomer = await Customer.findByIdAndUpdate(
+      { _id: id },
+      { status },
+      { new: true }
+    );
+    console.log(updatedCustomer);
+    res
+      .status(200)
+      .json(
+        responseStatus(
+          true,
+          "ok",
+          "Successfully Update the Status!",
+          updatedCustomer
+        )
+      );
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+module.exports = { createCustomer, getCustomerList, updateCustomerStatusById };
