@@ -13,4 +13,14 @@ const createVehicle = async (req, res) => {
   }
 };
 
-module.exports = { createVehicle };
+// all-vehicles-list
+const vehicleList = async (req, res) => {
+  try {
+    const allVehicle = await Vehicle.find();
+    res.status(200).json(responseStatus(true, "ok", "Success", allVehicle));
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+module.exports = { createVehicle, vehicleList };
