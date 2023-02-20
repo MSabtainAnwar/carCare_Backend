@@ -8,6 +8,7 @@ const {
   createCustomer,
   getCustomerList,
   updateCustomerStatusById,
+  updateCustomer,
 } = require("../controllers/customer");
 
 // create-customer
@@ -16,5 +17,7 @@ router.post("/create", createCustomerMiddle, createCustomer);
 router.post("/list", getCustomerList);
 // update-customer-status
 router.post("/update/status/:id", updateCustomerStatusById);
+// update-customer-info
+router.post("update/:id", updateCustomer);
 
 module.exports = router;

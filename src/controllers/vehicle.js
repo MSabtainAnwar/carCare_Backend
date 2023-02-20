@@ -24,5 +24,3 @@ const vehicleList = async (req, res) => {
 };
 
 module.exports = { createVehicle, vehicleList };
-
-

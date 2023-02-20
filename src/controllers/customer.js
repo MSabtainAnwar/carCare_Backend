@@ -163,4 +163,35 @@ const updateCustomerStatusById = async (req, res) => {
   }
 };
 
-module.exports = { createCustomer, getCustomerList, updateCustomerStatusById };
+// update-customer
+const updateCustomer = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(id);
+    const updateCustomer = await Customer.findByIdAndUpdate(
+      { _id: id },
+      req.body,
+      { new: true }
+    );
+    res
+      .status(200)
+      .json(
+        responseStatus(
+          true,
+          "ok",
+          "Successfully Update the Customer!",
+          updateCustomer
+        )
+      );
+      console.log(updateCustomer);
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+module.exports = {
+  createCustomer,
+  getCustomerList,
+  updateCustomerStatusById,
+  updateCustomer,
+};
