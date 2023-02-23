@@ -23,7 +23,6 @@ const loginAdmin = async (req, res) => {
       const adminData = await Admin.findOne({
         _id: data._id.toString(),
       }).select("-token -password");
-      console.log(adminData);
       res.status(200).json(responseStatus(true, "ok", "Success", adminData));
     }
   } catch (error) {
@@ -38,7 +37,6 @@ const verifyAdminToken = async (req, res) => {
     const adminData = await Admin.findOne({ _id: id }).select(
       "-token -password"
     );
-    console.log(adminData);
     res.status(200).json(responseStatus(true, "ok", "Success", adminData));
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));

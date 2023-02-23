@@ -18,6 +18,6 @@ router.post("/list", getCustomerList);
 // update-customer-status
 router.post("/update/status/:id", updateCustomerStatusById);
 // update-customer-info
-router.post("update/:id", updateCustomer);
+router.post("/update/:id", updateCustomer);
 
 module.exports = router;

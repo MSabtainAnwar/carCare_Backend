@@ -147,7 +147,6 @@ const updateCustomerStatusById = async (req, res) => {
       { status },
       { new: true }
     );
-    console.log(updatedCustomer);
     res
       .status(200)
       .json(
@@ -167,7 +166,6 @@ const updateCustomerStatusById = async (req, res) => {
 const updateCustomer = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log(id);
     const updateCustomer = await Customer.findByIdAndUpdate(
       { _id: id },
       req.body,
@@ -183,7 +181,6 @@ const updateCustomer = async (req, res) => {
           updateCustomer
         )
       );
-      console.log(updateCustomer);
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));
   }

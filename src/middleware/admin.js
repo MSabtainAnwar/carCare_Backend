@@ -62,11 +62,9 @@ const loginMiddle = async (req, res, next) => {
 const verifyTokenMiddle = async (req, res, next) => {
   try {
     const id = req.params.id;
-    console.log(id);
     const { token } = await Admin.findOne({ _id: id });
     const tokenVerification = jwt.verify(token, config.jwtSecretKey);
     next();
-    console.log(tokenVerification);
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));
   }
