@@ -16,8 +16,11 @@ const createExpense = async (req, res) => {
 // Expense-List
 const expenseList = async (req, res) => {
   try {
-    let { title, pageNo, perPage } = req.body;
+    let { title, pageNo, perPage, fromDate, toDate } = req.body;
+    console.log(fromDate, toDate);
+    let dateFilter = {};
     pageNo = pageNo || 1;
+    toDate = new Date("2022-01-31");
 
     const conditions = [];
 
@@ -31,10 +34,27 @@ const expenseList = async (req, res) => {
       });
     }
 
+    if (fromDate !== "") {
+      fromDate = new Date(`${fromDate}T00:00:00.000Z`);
+      dateFilter = { ...dateFilter, $gte: fromDate };
+    }
+
+    if (toDate !== "") {
+      toDate = new Date(`${toDate}T23:59:59.999Z`);
+      dateFilter = { ...dateFilter, $lte: toDate };
+    }
+
+    if (fromDate !== "" || toDate !== "") {
+      conditions.push({ createdAt: dateFilter });
+    }
+
+    console.log(conditions);
+
     await Expense.find(...conditions)
       .skip(perPage * pageNo - perPage)
       .limit(perPage)
       .exec(async (err, data) => {
+        console.log(data);
         if (err) {
           res.status(404).json(responseStatus(false, "not-found", `${err}`));
         }
