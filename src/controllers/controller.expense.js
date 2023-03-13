@@ -20,7 +20,6 @@ const expenseList = async (req, res) => {
     console.log(fromDate, toDate);
     let dateFilter = {};
     pageNo = pageNo || 1;
-    toDate = new Date("2022-01-31");
 
     const conditions = [];
 
