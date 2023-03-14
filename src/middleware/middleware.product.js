@@ -44,15 +44,20 @@ const createSelingMiddle = async (req, res, next) => {
         { _id: productId },
         { quantity: findProduct.quantity.toString() - quantity }
       );
+      let totalSale = salePrice * quantity - discount;
+      let totalBuy = buyPrice * quantity;
+      let profit = totalSale - totalBuy;
       // Create-Product-History
       const createHistory = await new ProductHistory({
         customerName,
         name,
         description,
         quantity,
+        buyPrice,
         salePrice,
         discount,
         productId,
+        profit,
       }).save();
       if (createHistory) {
         next();

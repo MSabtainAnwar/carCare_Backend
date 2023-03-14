@@ -86,7 +86,14 @@ const productHistorySchema = mongoose.Schema(
     quantity: {
       type: mongoose.Schema.Types.Decimal128,
     },
+    buyPrice: {
+      type: Number,
+      required: [true, "Buying Price must be required."],
+    },
     salePrice: {
+      type: Number,
+    },
+    profit: {
       type: Number,
     },
     discount: {

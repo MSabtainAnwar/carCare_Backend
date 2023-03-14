@@ -30,8 +30,9 @@ const createProductSelling = async (req, res) => {
       productId,
       quantity,
     } = req.body;
-    salePrice = salePrice - discount;
-    const profit = salePrice - buyPrice;
+
+    salePrice = salePrice * quantity - discount;
+    const profit = salePrice - buyPrice * quantity;
     const saleProduct = await ProductSaling.findOneAndUpdate(
       { productId },
       {
@@ -40,7 +41,7 @@ const createProductSelling = async (req, res) => {
         description,
         productId,
         $inc: {
-          buyPrice: buyPrice,
+          buyPrice: buyPrice * quantity,
           salePrice: salePrice,
           quantity: quantity,
           profit: profit,
@@ -62,14 +63,17 @@ const createProductSelling = async (req, res) => {
 // Return-product
 const productReturn = async (req, res) => {
   try {
-    const { quantity, buyPrice, salePrice, discount, productId } = req.body;
+    let { quantity, buyPrice, salePrice, discount, productId, profit } =
+      req.body;
+    // total-saling-price
+    let totalSale = salePrice * quantity - discount;
     // update-salling-table
     const updateSale = await ProductSaling.findOneAndUpdate(
       { productId },
       {
         $inc: {
-          buyPrice: -buyPrice,
-          salePrice: -salePrice,
+          buyPrice: -buyPrice * quantity,
+          salePrice: -totalSale,
           quantity: -quantity,
           profit: -profit,
           discount: -discount,
