@@ -73,4 +73,32 @@ const createSelingMiddle = async (req, res, next) => {
   }
 };
 
-module.exports = { createBuyingMiddle, createSelingMiddle };
+// For-Return_product
+const returnProductMiddle = async (req, res, next) => {
+  try {
+    const { quantity, productId, saleHistoryId } = req.body;
+
+    // delete-History
+    await ProductHistory.findByIdAndDelete({
+      _id: saleHistoryId,
+    });
+    // Add-quantity-in-Buy-table
+    await ProductBuying.findByIdAndUpdate(
+      { _id: productId },
+      {
+        $inc: {
+          quantity: quantity,
+        },
+      }
+    );
+    next();
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+module.exports = {
+  createBuyingMiddle,
+  createSelingMiddle,
+  returnProductMiddle,
+};

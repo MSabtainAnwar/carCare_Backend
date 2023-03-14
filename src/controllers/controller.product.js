@@ -33,7 +33,7 @@ const createProductSelling = async (req, res) => {
     salePrice = salePrice - discount;
     const profit = salePrice - buyPrice;
     const saleProduct = await ProductSaling.findOneAndUpdate(
-      { _id: productId },
+      { productId },
       {
         customerName,
         name,
@@ -59,4 +59,32 @@ const createProductSelling = async (req, res) => {
   }
 };
 
-module.exports = { createProductBuying, createProductSelling };
+// Return-product
+const productReturn = async (req, res) => {
+  try {
+    const { quantity, buyPrice, salePrice, discount, productId } = req.body;
+    // update-salling-table
+    const updateSale = await ProductSaling.findOneAndUpdate(
+      { productId },
+      {
+        $inc: {
+          buyPrice: -buyPrice,
+          salePrice: -salePrice,
+          quantity: -quantity,
+          profit: -profit,
+          discount: -discount,
+        },
+      },
+      { new: true }
+    );
+    res
+      .status(200)
+      .json(
+        responseStatus(true, "ok", "Successfully Product Returned.", updateSale)
+      );
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+module.exports = { createProductBuying, createProductSelling, productReturn };
