@@ -21,7 +21,6 @@ const createProductBuying = async (req, res) => {
 const createProductSelling = async (req, res) => {
   try {
     let {
-      customerName,
       name,
       description,
       buyPrice,
@@ -36,7 +35,6 @@ const createProductSelling = async (req, res) => {
     const saleProduct = await ProductSaling.findOneAndUpdate(
       { productId },
       {
-        customerName,
         name,
         description,
         productId,
@@ -94,13 +92,39 @@ const productReturn = async (req, res) => {
 // Product-Stock-List
 const productStockList = async (req, res) => {
   try {
-    const { stockAmount } = req.body;
-    const allStock = await ProductBuying.find();
-    const response = {
-      stockAmount,
-      allStock,
-    };
-    res.status(200).json(responseStatus(true, "ok", "Success.", response));
+    let { stockAmount, name, pageNo, perPage } = req.body;
+    pageNo = pageNo || 1;
+
+    const conditions = [];
+
+    // if-product-name-is Available
+    if (name !== "") {
+      conditions.push({
+        name: {
+          $regex: `${name}`,
+          $options: "i",
+        },
+      });
+    }
+
+    await ProductBuying.find(...conditions)
+      .skip(perPage * pageNo - perPage)
+      .limit(perPage)
+      .exec(async (err, data) => {
+        console.log(data);
+        if (err) {
+          res.status(404).json(responseStatus(false, "not-found", `${err}`));
+        }
+        const count = await ProductBuying.find().count();
+
+        const response = {
+          stockAmount,
+          allStock: data,
+          currentPage: pageNo,
+          pages: Math.ceil(count / perPage),
+        };
+        res.status(200).json(responseStatus(true, "ok", "Success", response));
+      });
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));
   }

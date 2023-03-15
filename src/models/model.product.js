@@ -33,10 +33,6 @@ const productBuySchema = mongoose.Schema(
 // Schema-for-sale-products
 const productSaleSchema = mongoose.Schema(
   {
-    customerName: {
-      type: String,
-      required: [true, "Customer Name must be required."],
-    },
     name: {
       type: String,
       required: [true, "Name must be required."],

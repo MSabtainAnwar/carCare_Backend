@@ -22,6 +22,8 @@ router.post("/buy/create", createBuyingMiddle, createProductBuying);
 router.post("/buy/list", productStockMiddle, productStockList);
 // create-product-selling
 router.post("/sale/create", createSelingMiddle, createProductSelling);
+// get-all-sale-list
+// router.post("/sale/list",);
 // return-product
 router.post("/return", returnProductMiddle, productReturn);
 

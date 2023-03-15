@@ -124,7 +124,7 @@ const productStockMiddle = async (req, res, next) => {
     for (let i = 0; i < allStock.length; i++) {
       stockAmount = stockAmount + allStock[i].price;
     }
-    req.body = { stockAmount };
+    req.body = { ...req.body, stockAmount };
     next();
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));
