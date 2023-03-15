@@ -91,4 +91,24 @@ const productReturn = async (req, res) => {
   }
 };
 
-module.exports = { createProductBuying, createProductSelling, productReturn };
+// Product-Stock-List
+const productStockList = async (req, res) => {
+  try {
+    const { stockAmount } = req.body;
+    const allStock = await ProductBuying.find();
+    const response = {
+      stockAmount,
+      allStock,
+    };
+    res.status(200).json(responseStatus(true, "ok", "Success.", response));
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+module.exports = {
+  createProductBuying,
+  createProductSelling,
+  productReturn,
+  productStockList,
+};

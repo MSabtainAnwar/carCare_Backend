@@ -102,8 +102,38 @@ const returnProductMiddle = async (req, res, next) => {
   }
 };
 
+// Product-Stock-Middleware
+const productStockMiddle = async (req, res, next) => {
+  try {
+    const allStock = await ProductBuying.find(
+      {},
+      {
+        name: 0,
+        description: 0,
+        _id: 0,
+        quantity: 0,
+        salePrice: 0,
+        productType: 0,
+        createdAt: 0,
+        updatedAt: 0,
+      }
+    );
+
+    let stockAmount = 0;
+    // loop-for-calculate-all-stock-Price
+    for (let i = 0; i < allStock.length; i++) {
+      stockAmount = stockAmount + allStock[i].price;
+    }
+    req.body = { stockAmount };
+    next();
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
 module.exports = {
   createBuyingMiddle,
   createSelingMiddle,
   returnProductMiddle,
+  productStockMiddle,
 };
