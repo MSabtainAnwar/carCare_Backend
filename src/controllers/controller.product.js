@@ -111,7 +111,6 @@ const productStockList = async (req, res) => {
       .skip(perPage * pageNo - perPage)
       .limit(perPage)
       .exec(async (err, data) => {
-        console.log(data);
         if (err) {
           res.status(404).json(responseStatus(false, "not-found", `${err}`));
         }
@@ -130,9 +129,116 @@ const productStockList = async (req, res) => {
   }
 };
 
+// Product-Sale-List
+const productSaleList = async (req, res) => {
+  try {
+    let { name, pageNo, perPage } = req.body;
+    pageNo = pageNo || 1;
+
+    const conditions = [];
+
+    // if-product-name-is Available
+    if (name !== "") {
+      conditions.push({
+        name: {
+          $regex: `${name}`,
+          $options: "i",
+        },
+      });
+    }
+
+    await ProductSaling.find(...conditions)
+      .skip(perPage * pageNo - perPage)
+      .limit(perPage)
+      .exec(async (err, data) => {
+        if (err) {
+          res.status(404).json(responseStatus(false, "not-found", `${err}`));
+        }
+        const count = await ProductSaling.find().count();
+
+        const response = {
+          allSales: data,
+          currentPage: pageNo,
+          pages: Math.ceil(count / perPage),
+        };
+        res.status(200).json(responseStatus(true, "ok", "Success", response));
+      });
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+// Product-Sale-history-List
+const productSaleHistoryList = async (req, res) => {
+  try {
+    let { filter, pageNo, perPage } = req.body;
+    pageNo = pageNo || 1;
+    let dateFilter = {};
+
+    const conditions = [];
+
+    // if-Product-name-is Available
+    if (filter.name !== "") {
+      conditions.push({
+        name: {
+          $regex: `${filter.name}`,
+          $options: "i",
+        },
+      });
+    }
+
+    // if-Customer-name-is Available
+    if (filter.customerName !== "") {
+      conditions.push({
+        customerName: {
+          $regex: `${filter.customerName}`,
+          $options: "i",
+        },
+      });
+    }
+
+    // if-fromDate-is-available
+    if (filter.fromDate !== "") {
+      filter.fromDate = new Date(`${filter.fromDate}T00:00:00.000Z`);
+      dateFilter = { ...dateFilter, $gte: filter.fromDate };
+    }
+
+    // if-toDate-is-available
+    if (filter.toDate !== "") {
+      filter.toDate = new Date(`${filter.toDate}T23:59:59.999Z`);
+      dateFilter = { ...dateFilter, $lte: filter.toDate };
+    }
+
+    if (filter.fromDate !== "" || filter.toDate !== "") {
+      conditions.push({ createdAt: dateFilter });
+    }
+
+    await ProductHistory.find(...conditions)
+      .skip(perPage * pageNo - perPage)
+      .limit(perPage)
+      .exec(async (err, data) => {
+        if (err) {
+          res.status(404).json(responseStatus(false, "not-found", `${err}`));
+        }
+        const count = await ProductHistory.find().count();
+
+        let finalData = {
+          productHistory: data,
+          currentPage: pageNo,
+          pages: Math.ceil(count / perPage),
+        };
+        res.status(200).json(responseStatus(true, "ok", "Success", finalData));
+      });
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
 module.exports = {
   createProductBuying,
   createProductSelling,
   productReturn,
   productStockList,
+  productSaleList,
+  productSaleHistoryList,
 };

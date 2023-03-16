@@ -14,6 +14,8 @@ const {
   createProductSelling,
   productReturn,
   productStockList,
+  productSaleList,
+  productSaleHistoryList,
 } = require("../controllers/controller.product");
 
 // create-product-buying
@@ -23,7 +25,9 @@ router.post("/buy/list", productStockMiddle, productStockList);
 // create-product-selling
 router.post("/sale/create", createSelingMiddle, createProductSelling);
 // get-all-sale-list
-// router.post("/sale/list",);
+router.post("/sale/list", productSaleList);
+// get-sale-history-list
+router.post("/sale/history/list", productSaleHistoryList);
 // return-product
 router.post("/return", returnProductMiddle, productReturn);
 
