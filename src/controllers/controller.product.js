@@ -213,7 +213,7 @@ const productSaleHistoryList = async (req, res) => {
       conditions.push({ createdAt: dateFilter });
     }
 
-    await ProductHistory.find(...conditions)
+    await ProductHistory.find({ $or: conditions })
       .skip(perPage * pageNo - perPage)
       .limit(perPage)
       .exec(async (err, data) => {
