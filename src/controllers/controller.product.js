@@ -177,6 +177,7 @@ const productSaleHistoryList = async (req, res) => {
     let dateFilter = {};
 
     const conditions = [];
+    let query = [];
 
     // if-Product-name-is Available
     if (filter.name !== "") {
@@ -214,7 +215,13 @@ const productSaleHistoryList = async (req, res) => {
       conditions.push({ createdAt: dateFilter });
     }
 
-    await ProductHistory.find({ $or: conditions })
+    if (conditions.length > 0) {
+      query.push({
+        $or: conditions,
+      });
+    }
+
+    await ProductHistory.find(...query)
       .skip(perPage * pageNo - perPage)
       .limit(perPage)
       .exec(async (err, data) => {

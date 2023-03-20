@@ -111,7 +111,6 @@ const productStockMiddle = async (req, res, next) => {
         name: 0,
         description: 0,
         _id: 0,
-        quantity: 0,
         salePrice: 0,
         productType: 0,
         createdAt: 0,
@@ -122,7 +121,9 @@ const productStockMiddle = async (req, res, next) => {
     let stockAmount = 0;
     // loop-for-calculate-all-stock-Price
     for (let i = 0; i < allStock.length; i++) {
-      stockAmount = stockAmount + allStock[i].price;
+      stockAmount =
+        stockAmount +
+        allStock[i].price * Number(allStock[i]?.quantity?.toString());
     }
     req.body = { ...req.body, stockAmount };
     next();
