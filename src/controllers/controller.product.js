@@ -121,6 +121,7 @@ const productStockList = async (req, res) => {
           allStock: data,
           currentPage: pageNo,
           pages: Math.ceil(count / perPage),
+          totalProducts: count,
         };
         res.status(200).json(responseStatus(true, "ok", "Success", response));
       });
