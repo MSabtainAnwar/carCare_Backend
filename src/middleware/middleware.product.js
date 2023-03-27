@@ -3,6 +3,8 @@ const {
   ProductSaling,
   ProductHistory,
 } = require("../models/model.product");
+const Admin = require("../models/admin");
+const bcrypt = require("Bcrypt");
 const responseStatus = require("../helpers/status");
 
 // For-Buy-Product
@@ -81,22 +83,35 @@ const createSelingMiddle = async (req, res, next) => {
 // For-Return_product
 const returnProductMiddle = async (req, res, next) => {
   try {
-    const { quantity, productId, saleHistoryId } = req.body;
-
-    // delete-History
-    await ProductHistory.findByIdAndDelete({
-      _id: saleHistoryId,
-    });
-    // Add-quantity-in-Buy-table
-    await ProductBuying.findByIdAndUpdate(
-      { _id: productId },
-      {
-        $inc: {
-          quantity: quantity,
-        },
+    const { quantity, productId, saleHistoryId, adminId, adminPassword } =
+      req.body;
+    const findAdmin = await Admin.findOne({ _id: adminId });
+    if (findAdmin) {
+      if (await bcrypt.compare(adminPassword, findAdmin.password)) {
+        // delete-History
+        await ProductHistory.findByIdAndDelete({
+          _id: saleHistoryId,
+        });
+        // Add-quantity-in-Buy-table
+        await ProductBuying.findByIdAndUpdate(
+          { _id: productId },
+          {
+            $inc: {
+              quantity: quantity,
+            },
+          }
+        );
+        next();
+      } else {
+        res
+          .status(401)
+          .json(responseStatus(false, "unauthorized", `Wrong Password.`));
       }
-    );
-    next();
+    } else {
+      res
+        .status(404)
+        .json(responseStatus(false, "not-found", `Admin not found.`));
+    }
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));
   }
