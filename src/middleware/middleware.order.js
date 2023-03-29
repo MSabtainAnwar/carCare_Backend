@@ -20,7 +20,7 @@ const getRemindMiddle = async (req, res, next) => {
 
     // Subtract 5 days
     let fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(today.getDate() - 5);
+    fiveDaysAgo.setDate(today.getDate() - 1);
 
     console.log(fiveDaysAgo);
     req.body = { remindDate: fiveDaysAgo };

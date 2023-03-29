@@ -31,6 +31,7 @@ const getAllReminderOrder = async (req, res) => {
     const findOrder = await Order.find({
       createdAt: { $lte: remindDate },
       remindOnOrder: true,
+      remindNumber: { $lt: 4 },
     });
     console.log(findOrder);
   } catch (error) {
