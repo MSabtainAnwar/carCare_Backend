@@ -19,11 +19,10 @@ const getRemindMiddle = async (req, res, next) => {
     let today = new Date();
 
     // Subtract 5 days
-    let fiveDaysAgo = new Date();
-    fiveDaysAgo.setDate(today.getDate() - 1);
+    let remindDate = new Date();
+    remindDate.setDate(today.getDate() - 1);
 
-    console.log(fiveDaysAgo);
-    req.body = { remindDate: fiveDaysAgo };
+    req.body = { remindDate };
     next();
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));

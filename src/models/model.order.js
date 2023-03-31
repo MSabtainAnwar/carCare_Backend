@@ -35,6 +35,10 @@ const orderSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    lastRemindDate: {
+      type: Date,
+      default: null,
+    },
     remindNumber: {
       type: Number,
       default: 0,
