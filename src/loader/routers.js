@@ -9,6 +9,7 @@ const expenseRoute = require("../routes/route.expense");
 const productRoute = require("../routes/route.product");
 const servicesRoute = require("../routes/route.services");
 const orderRoutes = require("../routes/route.order");
+const dashboardRoutes = require("../routes/route.dashboard");
 
 module.exports = (app) => {
   // bodyParser
@@ -24,4 +25,5 @@ module.exports = (app) => {
   app.use("/product", productRoute);
   app.use("/service", servicesRoute);
   app.use("/order", orderRoutes);
+  app.use("/dashboard", dashboardRoutes);
 };
