@@ -25,16 +25,31 @@ const orderSchema = mongoose.Schema(
     },
     currentMileage: {
       type: Number,
+      default: 0,
     },
     bestKM: {
       type: Number,
+      default: 0,
     },
     reminder: {
       type: Boolean,
       default: false,
     },
+    lastRemindDate: {
+      type: Date,
+      default: null,
+    },
+    remindNumber: {
+      type: Number,
+      default: 0,
+    },
+    remindOnOrder: {
+      type: Boolean,
+      default: true,
+    },
     discount: {
       type: Number,
+      default: 0,
     },
     total: {
       type: Number,
