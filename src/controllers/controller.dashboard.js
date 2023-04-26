@@ -4,8 +4,10 @@ const Order = require("../models/model.order");
 const Expense = require("../models/model.expense");
 const Services = require("../models/model.services");
 const { ProductBuying, ProductHistory } = require("../models/model.product");
-
+// helpers
 const responseStatus = require("../helpers/status");
+const getMonthDays = require("../helpers/getMonthDays");
+const createArray = require("../helpers/createArray");
 
 // Get-Dashboard-Analytics-Counts
 const getDashboardCounts = async (req, res) => {
@@ -75,4 +77,86 @@ const getDashboardCounts = async (req, res) => {
   }
 };
 
-module.exports = { getDashboardCounts };
+// sales-and-expense-graph-function
+const getSalesAndExpenseChart = async (req, res) => {
+  try {
+    let { year, month } = req.body;
+    month = Number(month);
+    year = Number(year);
+    let label = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    // condition
+    let query = {};
+    if (month >= 0) {
+      query = {
+        $gte: new Date(year, month, 1),
+        $lt: new Date(year, month + 1, 1),
+      };
+    } else {
+      query = { $gte: new Date(year, 0, 1), $lt: new Date(year + 1, 0, 1) };
+    }
+    // get-Data-from-DB
+    const expenses = await Expense.find({ createdAt: query });
+    // products-profit
+    const prodProfits = await ProductHistory.find({ createdAt: query });
+
+    if (month >= 0) {
+      let days = getMonthDays(year, month);
+      label = createArray(days);
+      const daysExpenses = new Array(days).fill(0);
+      const daysProdProfit = new Array(days).fill(0);
+      // get-expnese-according-to-Days
+      expenses.forEach((expense) => {
+        const day = new Date(expense.createdAt).getDate();
+        daysExpenses[day - 1] += expense.amount;
+      });
+      // get-products-profit-according-to-Days
+      prodProfits.forEach((profit) => {
+        const day = new Date(profit.createdAt).getDate();
+        daysProdProfit[day - 1] += profit.profit;
+      });
+      res.status(200).json(
+        responseStatus(true, "ok", "Success", {
+          expenseValues: daysExpenses,
+          salesValues: daysProdProfit,
+          label,
+        })
+      );
+    } else {
+      // Group expenses by month
+      const monthlyExpenses = new Array(12).fill(0);
+      const monthlyProdProfit = new Array(12).fill(0);
+      // get-expense
+      expenses.forEach((expense) => {
+        const month = expense.createdAt.getMonth();
+        monthlyExpenses[month] += expense.amount;
+      });
+      // get-product-profit
+      prodProfits.forEach((profit) => {
+        const month = profit.createdAt.getMonth();
+        monthlyProdProfit[month] += profit.profit;
+      });
+      res.status(200).json(
+        responseStatus(true, "ok", "Success", {
+          expenseValues: monthlyExpenses,
+          salesValues: monthlyProdProfit,
+          label,
+        })
+      );
+    }
+  } catch (error) {}
+};
+
+module.exports = { getDashboardCounts, getSalesAndExpenseChart };
