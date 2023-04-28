@@ -82,7 +82,9 @@ const getSalesAndExpenseChart = async (req, res) => {
   try {
     let { year, month } = req.body;
     month = Number(month);
-    year = Number(year);
+    year = Number(year || new Date().getFullYear());
+    console.log(year);
+    // by-default-year-labels
     let label = [
       "Jan",
       "Feb",
@@ -97,8 +99,9 @@ const getSalesAndExpenseChart = async (req, res) => {
       "Nov",
       "Dec",
     ];
-    // condition
+    // conditions
     let query = {};
+    // if-month-is-availabale
     if (month >= 0) {
       query = {
         $gte: new Date(year, month, 1),
@@ -107,16 +110,21 @@ const getSalesAndExpenseChart = async (req, res) => {
     } else {
       query = { $gte: new Date(year, 0, 1), $lt: new Date(year + 1, 0, 1) };
     }
-    // get-Data-from-DB
+    // get-Expense-Data-from-DB
     const expenses = await Expense.find({ createdAt: query });
     // products-profit
     const prodProfits = await ProductHistory.find({ createdAt: query });
+    // Order-Data
+    const orderData = await Order.find({ createdAt: query }).populate(
+      "servicesId"
+    );
 
+    // if-graph-calculate-the-value-on-the-basis-of-month-days
     if (month >= 0) {
       let days = getMonthDays(year, month);
       label = createArray(days);
       const daysExpenses = new Array(days).fill(0);
-      const daysProdProfit = new Array(days).fill(0);
+      const daysSales = new Array(days).fill(0);
       // get-expnese-according-to-Days
       expenses.forEach((expense) => {
         const day = new Date(expense.createdAt).getDate();
@@ -125,38 +133,88 @@ const getSalesAndExpenseChart = async (req, res) => {
       // get-products-profit-according-to-Days
       prodProfits.forEach((profit) => {
         const day = new Date(profit.createdAt).getDate();
-        daysProdProfit[day - 1] += profit.profit;
+        daysSales[day - 1] += profit.profit;
       });
+      // get-order-services-sale-according-to-days
+
+      orderData.forEach((order) => {
+        let servicesAmount = 0,
+          otherServicesAmount = 0,
+          discountAmount = 0;
+        const day = new Date(order.createdAt).getDate();
+        discountAmount += order?.discount || 0;
+        order?.servicesId.forEach((service) => {
+          servicesAmount += service?.price || 0;
+        });
+        order?.otherServices.forEach((service) => {
+          otherServicesAmount += service?.price || 0;
+        });
+        let finalSale = servicesAmount + otherServicesAmount - discountAmount;
+        console.log(finalSale);
+        daysSales[day - 1] += finalSale;
+      });
+      // calculate-profit
+      const daysProfit = daysSales.map(
+        (num, index) => num - daysExpenses[index]
+      );
+      // Response
       res.status(200).json(
         responseStatus(true, "ok", "Success", {
           expenseValues: daysExpenses,
-          salesValues: daysProdProfit,
+          salesValues: daysSales,
+          profitValues: daysProfit,
           label,
         })
       );
+      // if-graph-calculate-the-value-on-the-base-of-year
     } else {
       // Group expenses by month
       const monthlyExpenses = new Array(12).fill(0);
-      const monthlyProdProfit = new Array(12).fill(0);
-      // get-expense
+      const monthlySales = new Array(12).fill(0);
+      // get-expense-for-1-year
       expenses.forEach((expense) => {
         const month = expense.createdAt.getMonth();
         monthlyExpenses[month] += expense.amount;
       });
-      // get-product-profit
+      // get-product-profit-for-1-year
       prodProfits.forEach((profit) => {
         const month = profit.createdAt.getMonth();
-        monthlyProdProfit[month] += profit.profit;
+        monthlySales[month] += profit.profit;
       });
+      // get-order-sale-for-1-year
+      orderData.forEach((order) => {
+        let servicesAmount = 0,
+          otherServicesAmount = 0,
+          discountAmount = 0;
+        const month = order?.createdAt.getMonth();
+        discountAmount += order?.discount || 0;
+        order?.servicesId.forEach((service) => {
+          servicesAmount += service?.price || 0;
+        });
+        order?.otherServices.forEach((service) => {
+          otherServicesAmount += service?.price || 0;
+        });
+        let finalSale = servicesAmount + otherServicesAmount - discountAmount;
+        console.log(finalSale);
+        monthlySales[month] += finalSale;
+      });
+      // calculate-profit
+      const monthProfit = monthlySales?.map(
+        (num, index) => num - monthlyExpenses[index]
+      );
+      // Response
       res.status(200).json(
         responseStatus(true, "ok", "Success", {
           expenseValues: monthlyExpenses,
-          salesValues: monthlyProdProfit,
+          salesValues: monthlySales,
+          profitValues: monthProfit,
           label,
         })
       );
     }
-  } catch (error) {}
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
 };
 
 module.exports = { getDashboardCounts, getSalesAndExpenseChart };
