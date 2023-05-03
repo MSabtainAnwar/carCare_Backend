@@ -10,6 +10,7 @@ const config = require("./src/config/config");
 app.use(cookieParser());
 require("./src/loader/compression")(app);
 require("./src/loader/cors")(app);
+require("./src/loader/swagger")(app);
 require("./src/loader/db")();
 require("./src/loader/routers")(app);
 
