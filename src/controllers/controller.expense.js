@@ -22,6 +22,7 @@ const expenseList = async (req, res) => {
     pageNo = pageNo || 1;
 
     const conditions = [];
+    let query = [];
 
     // if-vehicle-no-is Available
     if (title !== "") {
@@ -48,8 +49,13 @@ const expenseList = async (req, res) => {
     }
 
     console.log(conditions);
+    if (conditions.length > 0) {
+      query.push({
+        $and: conditions,
+      });
+    }
 
-    await Expense.find(...conditions)
+    await Expense.find(...query)
       .skip(perPage * pageNo - perPage)
       .limit(perPage)
       .exec(async (err, data) => {

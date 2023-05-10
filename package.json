@@ -20,7 +20,7 @@
     "mongoose": "^6.8.4",
     "nodemon": "^2.0.20",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^4.6.2",
+    "swagger-ui-express": "^4.6.3",
     "validator": "^13.7.0"
   }
 }
