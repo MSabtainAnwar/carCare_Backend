@@ -35,4 +35,24 @@ const createCustomerMiddle = async (req, res, next) => {
   }
 };
 
-module.exports = { createCustomerMiddle };
+// Edit-Customer-Middle
+const editCustomerMiddle = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { phone } = req.body;
+    const findPhone = await Customer.findOne({ phone });
+    if (findPhone) {
+      if (findPhone?._id !== id) {
+        res
+          .status(409)
+          .json(responseStatus(false, "conflict", "Phone No already exist."));
+      }
+    } else {
+      next();
+    }
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+module.exports = { createCustomerMiddle, editCustomerMiddle };
