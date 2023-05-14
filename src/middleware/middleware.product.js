@@ -11,9 +11,18 @@ const responseStatus = require("../helpers/status");
 const createBuyingMiddle = async (req, res, next) => {
   try {
     const { name } = req.body;
-    const findProduct = await ProductBuying.findOne({ name }, null, {
-      runValidators: true,
-    });
+    const findProduct = await ProductBuying.findOne(
+      {
+        name: {
+          $regex: `${name}`,
+          $options: "i",
+        },
+      },
+      null,
+      {
+        runValidators: true,
+      }
+    );
     if (findProduct) {
       res
         .status(409)

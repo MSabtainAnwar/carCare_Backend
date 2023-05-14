@@ -40,9 +40,9 @@ const editCustomerMiddle = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { phone } = req.body;
-    const findPhone = await Customer.findOne({ phone });
+    const findPhone = await Customer.findOne({ phone, _id: { $ne: id } });
     if (findPhone) {
-      if (findPhone?._id !== id) {
+      if (findPhone) {
         res
           .status(409)
           .json(responseStatus(false, "conflict", "Phone No already exist."));
