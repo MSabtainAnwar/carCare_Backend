@@ -52,4 +52,15 @@ const vehicleList = async (req, res) => {
   }
 };
 
-module.exports = { createVehicle, vehicleList };
+// Get-Vehicles-By-Customer-Id
+const getVehicleByCustomerId = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const getVehicles = await Vehicle.find({ customerId: id });
+    res.status(200).json(responseStatus(true, "ok", "Success", getVehicles));
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+module.exports = { createVehicle, vehicleList, getVehicleByCustomerId };
