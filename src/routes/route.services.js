@@ -7,11 +7,14 @@ const router = express.Router();
 const {
   createServices,
   servicesList,
+  servicesListSimple,
 } = require("../controllers/controller.services");
 
 // create-Expense
 router.post("/create", createServices);
-// expense-list
+// expense-list-with-pagination
 router.post("/list", servicesList);
+// expense-list-without-pagination
+router.post("/list/simple", servicesListSimple);
 
 module.exports = router;

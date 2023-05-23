@@ -55,4 +55,14 @@ const servicesList = async (req, res) => {
   }
 };
 
-module.exports = { createServices, servicesList };
+// Services-List-with-out-pagination
+const servicesListSimple = async (req, res) => {
+  try {
+    const allServices = await Services.find();
+    res.status(200).json(responseStatus(true, "ok", "Success", allServices));
+  } catch (error) {
+    res.status(404).json(responseStatus(false, "not-found", `${error}`));
+  }
+};
+
+module.exports = { createServices, servicesList, servicesListSimple };
