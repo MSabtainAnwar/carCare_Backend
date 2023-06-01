@@ -29,6 +29,8 @@ const createProductSelling = async (req, res) => {
       productId,
       quantity,
     } = req.body;
+    // fetch the created sale
+    const createHistory = req.createHistory;
 
     salePrice = salePrice * quantity - discount;
     const profit = salePrice - buyPrice * quantity;
@@ -51,7 +53,7 @@ const createProductSelling = async (req, res) => {
     res
       .status(200)
       .json(
-        responseStatus(true, "ok", "Successfully Product sold.", saleProduct)
+        responseStatus(true, "ok", "Successfully Product sold.", createHistory)
       );
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));

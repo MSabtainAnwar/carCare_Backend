@@ -71,6 +71,7 @@ const createSelingMiddle = async (req, res, next) => {
         profit,
       }).save();
       if (createHistory) {
+        req.createHistory = createHistory;
         next();
       }
     } else {
