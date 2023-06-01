@@ -107,24 +107,28 @@ const productStockList = async (req, res) => {
       });
     }
 
-    await ProductBuying.find(...conditions)
-      .skip(perPage * pageNo - perPage)
-      .limit(perPage)
-      .exec(async (err, data) => {
-        if (err) {
-          res.status(404).json(responseStatus(false, "not-found", `${err}`));
-        }
-        const count = await ProductBuying.find().count();
+    let dataQuery = ProductBuying.find(...conditions);
 
-        const response = {
-          stockAmount,
-          allStock: data,
-          currentPage: pageNo,
-          pages: Math.ceil(count / perPage),
-          totalProducts: count,
-        };
-        res.status(200).json(responseStatus(true, "ok", "Success", response));
-      });
+    if (perPage === null) {
+      // Return all data
+      dataQuery = dataQuery.skip(0).limit(0);
+    } else {
+      // Apply pagination
+      dataQuery = dataQuery.skip(perPage * pageNo - perPage).limit(perPage);
+    }
+
+    const data = await dataQuery.exec();
+    const count = await ProductBuying.find().count();
+
+    const response = {
+      stockAmount,
+      allStock: data,
+      currentPage: pageNo,
+      pages: Math.ceil(count / perPage),
+      totalProducts: count,
+    };
+
+    res.status(200).json(responseStatus(true, "ok", "Success", response));
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));
   }
