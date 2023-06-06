@@ -62,7 +62,11 @@ const getAllReminderOrder = async (req, res) => {
         const update = { $set: { reminder: true } };
         const options = { multi: true, new: true };
         Order.updateMany(filter, update, options)
-          .then(() => Order.find(filter))
+          .then(() =>
+            Order.find(filter).populate(
+              "customerId vehicleId servicesId productId"
+            )
+          )
           .then((docs) => {
             res.status(200).json(responseStatus(true, "ok", "Success", docs));
           })
