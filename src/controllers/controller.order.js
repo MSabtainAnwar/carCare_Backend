@@ -95,7 +95,16 @@ const goToRemindCustomer = async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json(responseStatus(true, "ok", "Success", updatedOrder));
+    res
+      .status(200)
+      .json(
+        responseStatus(
+          true,
+          "ok",
+          "You Successfully Reminded the Customer!",
+          updatedOrder
+        )
+      );
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));
   }
