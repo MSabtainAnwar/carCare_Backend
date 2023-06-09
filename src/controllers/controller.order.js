@@ -14,11 +14,27 @@ const createOrder = async (req, res) => {
 // get-order-list
 const getOrderListByCustomerId = async (req, res) => {
   try {
-    const { customerId } = req.body;
-    const getList = await Order.find({ customerId })?.populate(
-      "customerId vehicleId servicesId productId"
-    );
-    res.status(200).json(responseStatus(true, "ok", "Success", getList));
+    let { customerId, pageNo, perPage } = req.body;
+    pageNo = pageNo || 1;
+    await Order.find({ customerId })
+      .skip(perPage * pageNo - perPage)
+      .limit(perPage)
+      .sort({ createdAt: -1 })
+      ?.populate("customerId vehicleId servicesId productId")
+      .exec(async (err, data) => {
+        console.log(data);
+        if (err) {
+          res.status(404).json(responseStatus(false, "not-found", `${err}`));
+        }
+        const count = await Order.find({ customerId }).count();
+
+        let finalData = {
+          orders: data,
+          currentPage: pageNo,
+          pages: Math.ceil(count / perPage),
+        };
+        res.status(200).json(responseStatus(true, "ok", "Success", finalData));
+      });
   } catch (error) {
     res.status(404).json(responseStatus(false, "not-found", `${error}`));
   }
